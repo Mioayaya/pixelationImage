@@ -17,7 +17,7 @@ const PixelateByRgb:FC = memo(() => {
     const img = new Image();
     img.src = URL.createObjectURL(input.files[0]);
 
-    img.onload = function () {
+    img.onload = () => {
       // Set canvas dimensions to match image dimensions
       canvas.width = img.width;
       canvas.height = img.height;
@@ -29,7 +29,7 @@ const PixelateByRgb:FC = memo(() => {
       const pixelSize = 10;
       const imageData = ctx.getImageData(0, 0, img.width, img.height);
       const data = imageData.data;
-
+      
       for (let y = 0; y < img.height; y += pixelSize) {
         for (let x = 0; x < img.width; x += pixelSize) {
           const startIndex = (y * img.width + x) * 4;
@@ -51,7 +51,7 @@ const PixelateByRgb:FC = memo(() => {
           }
         }
       }
-
+      
       ctx.putImageData(imageData, 0, 0);
     };
   };
@@ -71,8 +71,8 @@ const PixelateByRgb:FC = memo(() => {
 
   return (
     <PixelateByRgbDiv >
-      <input type="file" ref={inputRef} accept="image/*" onChange={handleImage} />
-      <canvas ref={canvasRef} id="pixelatedCanvas" style={{ border: '1px solid black' }}></canvas>
+      <canvas className='canvas' ref={canvasRef} id="pixelatedCanvas"></canvas>
+      <input type="file" ref={inputRef} accept="image/*" onChange={() => handleImage()} />
       <button onClick={handleDownload}>Download Pixelated Image</button>
     </PixelateByRgbDiv>
   );
