@@ -1,13 +1,21 @@
-import React, { FC, memo, useRef, useState } from 'react';
-import { Slider } from '@arco-design/web-react';
+import React, { FC, memo, useEffect, useRef, useState } from 'react';
+import { Message, Slider } from '@arco-design/web-react';
 import { PixelateByRgbDiv } from './style';
 
 const PixelateByRgb:FC = memo(() => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [value,SetValue] = useState(10);
+  const [value,setValue] = useState<number>(10);
+  const [lock,setLoct] = useState<boolean>(false);
+  const [realDo,setRealDo] = useState<boolean>(false);
 
-  const handleImage = () => {
+  useEffect(() => {
+    if(realDo) {
+      handleImage(value);
+    }
+  },[realDo,value]);
+
+  const handleImage = (_value:number) => {
     const input:any = inputRef.current;
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
@@ -15,9 +23,15 @@ const PixelateByRgb:FC = memo(() => {
     if (!canvas || !ctx) {
       return;
     }
+    if(!input.files[0]) return;
+    if(!_value) return;
+
+    setLoct(true);
+    Message.warning('像素化处理中···');
 
     const img = new Image();
     img.src = URL.createObjectURL(input.files[0]);
+    
 
     img.onload = () => {
       // Set canvas dimensions to match image dimensions
@@ -28,7 +42,7 @@ const PixelateByRgb:FC = memo(() => {
       ctx.drawImage(img, 0, 0, img.width, img.height);
 
       // Apply pixelation effect using pixel data
-      const pixelSize = value;
+      const pixelSize = _value;
       const imageData = ctx.getImageData(0, 0, img.width, img.height);
       const data = imageData.data;
       
@@ -55,6 +69,9 @@ const PixelateByRgb:FC = memo(() => {
       }
       
       ctx.putImageData(imageData, 0, 0);
+      setLoct(false);
+      setRealDo(false);
+      Message.success('像素化处理完成···');
     };
   };
 
@@ -71,24 +88,21 @@ const PixelateByRgb:FC = memo(() => {
     a.click();
   };
 
-  const sliderPixelate = (e:number) => {
-    SetValue(e);
-    handleImage();
-  }
-
   return (
     <PixelateByRgbDiv >
       <canvas className='canvas' ref={canvasRef} id="pixelatedCanvas"></canvas>
       <div>调整像素度</div>
       <Slider
+        disabled={lock}
         defaultValue={10}
         max={50}
         step={1}
         value={value}
-        onChange={(e) => sliderPixelate(e as number)}
+        onAfterChange={() => setRealDo(true)}
+        onChange={e => setValue(e as number)}
         style={{width:'200px',marginTop:'10px'}}
       />
-      <input className='input' type="file" ref={inputRef} accept="image/*" onChange={() => handleImage()} />
+      <input className='input' type="file" ref={inputRef} accept="image/*" onChange={() => handleImage(value)} />
       <button className='download' onClick={handleDownload}>Download Pixelated Image</button>
     </PixelateByRgbDiv>
   );
