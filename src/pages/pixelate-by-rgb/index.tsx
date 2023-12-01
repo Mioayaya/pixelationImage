@@ -1,5 +1,6 @@
 import React, { FC, memo, useEffect, useRef, useState } from 'react';
-import { Message, Slider } from '@arco-design/web-react';
+import { Message, Slider, Spin } from '@arco-design/web-react';
+import { IconLoading } from '@arco-design/web-react/icon';
 import { PixelateByRgbDiv } from './style';
 
 const PixelateByRgb:FC = memo(() => {
@@ -24,10 +25,9 @@ const PixelateByRgb:FC = memo(() => {
       return;
     }
     if(!input.files[0]) return;
-    if(!_value) return;
+    
 
     setLoct(true);
-    Message.warning('像素化处理中···');
 
     const img = new Image();
     img.src = URL.createObjectURL(input.files[0]);
@@ -45,6 +45,12 @@ const PixelateByRgb:FC = memo(() => {
       const pixelSize = _value;
       const imageData = ctx.getImageData(0, 0, img.width, img.height);
       const data = imageData.data;
+      if(!_value) {
+        ctx.putImageData(imageData, 0, 0);
+        setLoct(false);
+        setRealDo(false);
+        return;
+      }
       
       for (let y = 0; y < img.height; y += pixelSize) {
         for (let x = 0; x < img.width; x += pixelSize) {
@@ -71,7 +77,6 @@ const PixelateByRgb:FC = memo(() => {
       ctx.putImageData(imageData, 0, 0);
       setLoct(false);
       setRealDo(false);
-      Message.success('像素化处理完成···');
     };
   };
 
@@ -90,7 +95,9 @@ const PixelateByRgb:FC = memo(() => {
 
   return (
     <PixelateByRgbDiv >
-      <canvas className='canvas' ref={canvasRef} id="pixelatedCanvas"></canvas>
+      <Spin loading={lock} size={20} icon={<IconLoading/>} >
+        <canvas className='canvas' ref={canvasRef} id="pixelatedCanvas"></canvas>
+      </Spin>
       <div>调整像素度</div>
       <Slider
         disabled={lock}
