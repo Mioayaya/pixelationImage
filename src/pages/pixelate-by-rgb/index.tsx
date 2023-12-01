@@ -1,9 +1,11 @@
-import React, { FC, memo, useRef } from 'react';
+import React, { FC, memo, useRef, useState } from 'react';
+import { Slider } from '@arco-design/web-react';
 import { PixelateByRgbDiv } from './style';
 
 const PixelateByRgb:FC = memo(() => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [value,SetValue] = useState(10);
 
   const handleImage = () => {
     const input:any = inputRef.current;
@@ -26,7 +28,7 @@ const PixelateByRgb:FC = memo(() => {
       ctx.drawImage(img, 0, 0, img.width, img.height);
 
       // Apply pixelation effect using pixel data
-      const pixelSize = 10;
+      const pixelSize = value;
       const imageData = ctx.getImageData(0, 0, img.width, img.height);
       const data = imageData.data;
       
@@ -69,11 +71,25 @@ const PixelateByRgb:FC = memo(() => {
     a.click();
   };
 
+  const sliderPixelate = (e:number) => {
+    SetValue(e);
+    handleImage();
+  }
+
   return (
     <PixelateByRgbDiv >
       <canvas className='canvas' ref={canvasRef} id="pixelatedCanvas"></canvas>
-      <input type="file" ref={inputRef} accept="image/*" onChange={() => handleImage()} />
-      <button onClick={handleDownload}>Download Pixelated Image</button>
+      <div>调整像素度</div>
+      <Slider
+        defaultValue={10}
+        max={50}
+        step={1}
+        value={value}
+        onChange={(e) => sliderPixelate(e as number)}
+        style={{width:'200px',marginTop:'10px'}}
+      />
+      <input className='input' type="file" ref={inputRef} accept="image/*" onChange={() => handleImage()} />
+      <button className='download' onClick={handleDownload}>Download Pixelated Image</button>
     </PixelateByRgbDiv>
   );
 });
