@@ -1,5 +1,5 @@
-import React, { FC, memo, useEffect, useRef, useState } from 'react';
-import { Message, Slider, Spin } from '@arco-design/web-react';
+import { FC, memo, useEffect, useRef, useState } from 'react';
+import { Slider, Spin } from '@arco-design/web-react';
 import { IconLoading } from '@arco-design/web-react/icon';
 import { PixelateByRgbDiv } from './style';
 

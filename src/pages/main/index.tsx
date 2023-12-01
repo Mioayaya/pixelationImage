@@ -20,17 +20,12 @@ const PixelateImage:FC = memo(() => {
     img.src = URL.createObjectURL(input.files[0]);
 
     img.onload = function () {
-      // Set canvas dimensions to match image dimensions
       canvas.width = img.width;
       canvas.height = img.height;
 
-      // Draw the original image on the canvas
       ctx.drawImage(img, 0, 0, img.width, img.height);
 
-      // Apply pixelation effect
       const pixelSize = 10;
-      // ctx.imageSmoothingEnabled = false;
-      // ctx.drawImage(canvas, 0, 0, img.width, img.height, 0, 0, img.width / pixelSize, img.height / pixelSize);
       outCtx.imageSmoothingEnabled = false;
       outCtx.drawImage(canvas, 0, 0, img.width, img.height, 0, 0, img.width / pixelSize, img.height / pixelSize);
     
@@ -41,10 +36,10 @@ const PixelateImage:FC = memo(() => {
   const handleDownload = () => {
     const canvas = canvasRef.current;
     if(!canvas) return;
-    const dataURL = canvas.toDataURL(); // Get the data URL of the canvas content
+    const dataURL = canvas.toDataURL();
     const a = document.createElement('a');
     a.href = dataURL;
-    a.download = 'pixelated_image.png'; // Set the filename for the download
+    a.download = 'pixelated_image.png';
     a.click();
   };
 
